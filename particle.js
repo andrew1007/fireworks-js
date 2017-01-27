@@ -10,12 +10,11 @@ class Particle {
     this.posY = this.canvas.height
     let angle = Math.random() * Math.PI * 2
     let speed = Math.cos(Math.random() * Math.PI / 2) * 15.7
-    // console.log(speed);
     this.velX = Math.cos(angle) * speed + 0.5;
     this.velY = Math.sin(angle) * speed;
     this.radius = radius
-    this.size = 5.5
-    this.shrink = .960
+    this.size = 5
+    this.shrink = .950
     this.color = color
   }
 
@@ -28,9 +27,6 @@ class Particle {
   }
 
   update(){
-    // console.log("updated");
-    // console.log(this.velX);
-    // console.log(this.velY);
     this.velX *= this.resistance
     this.velY *= this.resistance
     this.velY += this.gravity

@@ -25,17 +25,9 @@ class Rocket {
     this.velX *= this.resistance;
     this.velY *= this.resistance;
 
-    // gravity down
     this.velY += this.gravity;
-    // update position based on speed
     this.x += this.velX;
     this.y += this.velY;
-
-    // // shrink
-    // this.size *= this.shrink;
-    //
-    // // fade out
-    // this.alpha -= this.fade;
   }
 
   exploded(){
@@ -47,18 +39,6 @@ class Rocket {
   }
 
   render(){
-    // this.context.save();
-
-    // this.context.globalCompositeOperation = 'lighter';
-
-    // var x = this.pos.x,
-    //     y = this.pos.y,
-    //     r = this.size / 2;
-    //
-    // var gradient = this.context.createRadialGradient(x, y, 0.1, x, y, r);
-    // gradient.addColorStop(0.1, "rgba(255, 255, 255 ," + this.alpha + ")");
-    // gradient.addColorStop(1, "rgba(0, 0, 0, " + this.alpha + ")");
-
     this.context.fillStyle = 'white';
 
     this.context.beginPath();

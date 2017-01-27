@@ -24,12 +24,15 @@ class Launch {
         this.canvas
       )
       this.rockets = this.rockets.concat(rocket)
-
-    // this.update()
   }
 
   welcomeFireworks(){
-    this.rockets.push(new Rocket(this.x, this.y, this.context, this.canvas))
+    let rocket = new Rocket(this.x,
+      this.y,
+      this.context,
+      this.canvas
+    )
+    this.rockets.push(rocket)
     this.update()
   }
 
@@ -55,7 +58,6 @@ class Launch {
     }
     this.rockets.forEach((firework, i) =>{
     let color = this.getRandomColor(1)
-    // console.log(color);
       if (firework.exploded()){
         for(let i=0; i < 20; i++){
           this.particles = this.particles.concat(new Particle(firework.x, firework.y, this.context, this.canvas, 3, color))
@@ -65,11 +67,9 @@ class Launch {
         firework.render()
         firework.update()
       })
-      // console.log(this.particles);
       this.particles = this.particles.filter( (particle) => {
         return particle.exists()
       })
-      // console.log(this.particles);
       this.particles.forEach((particle, i) => {
         if (!particle.exists()) {
           this.particles.splice(i, 1)
@@ -77,26 +77,27 @@ class Launch {
         particle.render()
         particle.update()
       })
-      console.log(this.particles);
     }
-
-  distance(rocketPosX, rocketPosY){
-    Math.sqrt(Math.pow(this.x - rocketPosX, 2) + Math.pow(this.y - rocketPosY, 2))
-  }
 
 }
 
-// canvas = document.getElementById('canvas')
-// ctx = canvas.getContext( '2d' )
 
-
+document.body.style.overflow = "hidden"
 let canvas = document.getElementById('canvas')
 let ctx = canvas.getContext( '2d' )
 ctx.canvas.width  = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
+
+window.addEventListener("resize", () => {
+  let canvas = document.getElementById('canvas')
+  let ctx = canvas.getContext( '2d' )
+  ctx.canvas.width  = window.innerWidth;
+  ctx.canvas.height = window.innerHeight;
+})
+
 fireworksArr = []
 clearScreen = () =>{
-  ctx.fillStyle = "rgba(0, 0, 0, .15)";
+  ctx.fillStyle = "rgba(0, 0, 0, .1)";
   ctx.fillRect(0,0, canvas.width, canvas.height)
   requestAnimationFrame(() => clearScreen())
 }
@@ -104,8 +105,7 @@ clearScreen = () =>{
 clearScreen()
 
 const oneThird = Math.floor(ctx.canvas.width / 3)
-
-const twoThird = Math.floor(ctx.canvas.width /2 )
+const twoThird = Math.floor(ctx.canvas.width / 2 )
 const oneWhole = Math.floor(ctx.canvas.width * 2 / 3)
 
 for (let i =0; i < 13; i++){
@@ -114,6 +114,10 @@ for (let i =0; i < 13; i++){
   new Launch(oneWhole, canvas.height, ctx, canvas).welcomeFireworks()
 }
 
+window.setTimeout(() =>{
+  document.getElementById("fireworks-message").style.zIndex="-1"
+}, 3500)
+
 document.addEventListener("click",
 (e) => {
   let xPos = e.clientX;
@@ -121,22 +125,10 @@ document.addEventListener("click",
   fireworksArr = fireworksArr.filter( firework => {
     return firework.exists()
   })
-  for (let i = 0; i < 6; i++){
+  for (let i = 0; i < 20; i++){
     var x = new Launch(xPos, canvas.height, ctx, canvas)
       x.addFirework(e)
       x.update()
   }
-  // fireworksArr.push(new Launch(xPos, canvas.height, ctx, canvas))
-  // fireworksArr.forEach( (firework, i) => {
-  //   if (!firework.exists()){
-  //     fireworksArr.splice(i, 1)
-  //   }
-  //   firework.addFirework(e)
-  //   if (i === 0){
-  //     firework.update()
-  //   }
-  // } )
-  // x.addFirework(e)
-  // var x = null
 }
 )

@@ -63,12 +63,11 @@
 	    let yPos = this.y;
 	    let rocket = new Rocket(xPos, yPos, this.context, this.canvas);
 	    this.rockets = this.rockets.concat(rocket);
-	
-	    // this.update()
 	  }
 	
 	  welcomeFireworks() {
-	    this.rockets.push(new Rocket(this.x, this.y, this.context, this.canvas));
+	    let rocket = new Rocket(this.x, this.y, this.context, this.canvas);
+	    this.rockets.push(rocket);
 	    this.update();
 	  }
 	
@@ -94,7 +93,6 @@
 	    }
 	    this.rockets.forEach((firework, i) => {
 	      let color = this.getRandomColor(1);
-	      // console.log(color);
 	      if (firework.exploded()) {
 	        for (let i = 0; i < 20; i++) {
 	          this.particles = this.particles.concat(new Particle(firework.x, firework.y, this.context, this.canvas, 3, color));
@@ -104,11 +102,9 @@
 	      firework.render();
 	      firework.update();
 	    });
-	    // console.log(this.particles);
 	    this.particles = this.particles.filter(particle => {
 	      return particle.exists();
 	    });
-	    // console.log(this.particles);
 	    this.particles.forEach((particle, i) => {
 	      if (!particle.exists()) {
 	        this.particles.splice(i, 1);
@@ -116,26 +112,26 @@
 	      particle.render();
 	      particle.update();
 	    });
-	    console.log(this.particles);
-	  }
-	
-	  distance(rocketPosX, rocketPosY) {
-	    Math.sqrt(Math.pow(this.x - rocketPosX, 2) + Math.pow(this.y - rocketPosY, 2));
 	  }
 	
 	}
 	
-	// canvas = document.getElementById('canvas')
-	// ctx = canvas.getContext( '2d' )
-	
-	
+	document.body.style.overflow = "hidden";
 	let canvas = document.getElementById('canvas');
 	let ctx = canvas.getContext('2d');
 	ctx.canvas.width = window.innerWidth;
 	ctx.canvas.height = window.innerHeight;
+	
+	window.addEventListener("resize", () => {
+	  let canvas = document.getElementById('canvas');
+	  let ctx = canvas.getContext('2d');
+	  ctx.canvas.width = window.innerWidth;
+	  ctx.canvas.height = window.innerHeight;
+	});
+	
 	fireworksArr = [];
 	clearScreen = () => {
-	  ctx.fillStyle = "rgba(0, 0, 0, .15)";
+	  ctx.fillStyle = "rgba(0, 0, 0, .1)";
 	  ctx.fillRect(0, 0, canvas.width, canvas.height);
 	  requestAnimationFrame(() => clearScreen());
 	};
@@ -143,7 +139,6 @@
 	clearScreen();
 	
 	const oneThird = Math.floor(ctx.canvas.width / 3);
-	
 	const twoThird = Math.floor(ctx.canvas.width / 2);
 	const oneWhole = Math.floor(ctx.canvas.width * 2 / 3);
 	
@@ -153,29 +148,21 @@
 	  new Launch(oneWhole, canvas.height, ctx, canvas).welcomeFireworks();
 	}
 	
+	window.setTimeout(() => {
+	  document.getElementById("fireworks-message").style.zIndex = "-1";
+	}, 3500);
+	
 	document.addEventListener("click", e => {
 	  let xPos = e.clientX;
 	  let yPos = e.clientY;
 	  fireworksArr = fireworksArr.filter(firework => {
 	    return firework.exists();
 	  });
-	  for (let i = 0; i < 6; i++) {
+	  for (let i = 0; i < 20; i++) {
 	    var x = new Launch(xPos, canvas.height, ctx, canvas);
 	    x.addFirework(e);
 	    x.update();
 	  }
-	  // fireworksArr.push(new Launch(xPos, canvas.height, ctx, canvas))
-	  // fireworksArr.forEach( (firework, i) => {
-	  //   if (!firework.exists()){
-	  //     fireworksArr.splice(i, 1)
-	  //   }
-	  //   firework.addFirework(e)
-	  //   if (i === 0){
-	  //     firework.update()
-	  //   }
-	  // } )
-	  // x.addFirework(e)
-	  // var x = null
 	});
 
 /***/ },
@@ -209,17 +196,9 @@
 	    this.velX *= this.resistance;
 	    this.velY *= this.resistance;
 	
-	    // gravity down
 	    this.velY += this.gravity;
-	    // update position based on speed
 	    this.x += this.velX;
 	    this.y += this.velY;
-	
-	    // // shrink
-	    // this.size *= this.shrink;
-	    //
-	    // // fade out
-	    // this.alpha -= this.fade;
 	  }
 	
 	  exploded() {
@@ -231,18 +210,6 @@
 	  }
 	
 	  render() {
-	    // this.context.save();
-	
-	    // this.context.globalCompositeOperation = 'lighter';
-	
-	    // var x = this.pos.x,
-	    //     y = this.pos.y,
-	    //     r = this.size / 2;
-	    //
-	    // var gradient = this.context.createRadialGradient(x, y, 0.1, x, y, r);
-	    // gradient.addColorStop(0.1, "rgba(255, 255, 255 ," + this.alpha + ")");
-	    // gradient.addColorStop(1, "rgba(0, 0, 0, " + this.alpha + ")");
-	
 	    this.context.fillStyle = 'white';
 	
 	    this.context.beginPath();
@@ -272,12 +239,11 @@
 	    this.posY = this.canvas.height;
 	    let angle = Math.random() * Math.PI * 2;
 	    let speed = Math.cos(Math.random() * Math.PI / 2) * 15.7;
-	    // console.log(speed);
 	    this.velX = Math.cos(angle) * speed + 0.5;
 	    this.velY = Math.sin(angle) * speed;
 	    this.radius = radius;
-	    this.size = 5.5;
-	    this.shrink = .960;
+	    this.size = 5;
+	    this.shrink = .950;
 	    this.color = color;
 	  }
 	
@@ -290,9 +256,6 @@
 	  }
 	
 	  update() {
-	    // console.log("updated");
-	    // console.log(this.velX);
-	    // console.log(this.velY);
 	    this.velX *= this.resistance;
 	    this.velY *= this.resistance;
 	    this.velY += this.gravity;

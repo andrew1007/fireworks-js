@@ -4,12 +4,21 @@
   background-color: black;
 }
 
-.fireworks-message{
+#fireworks-message{
+  font-family: sans-serif;
   position: absolute;
-  top: 400px;
-  left: 400px;
-  margin: 0 auto;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
   color: white;
   font-size: 40px;
-  z-index: 1;
+}
+
+#git {
+  z-index: 100;
+}
+
+body {
+  margin: -10px -10px -10px -10px;
 }
