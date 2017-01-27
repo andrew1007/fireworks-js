@@ -1,0 +1,41 @@
+#canvas {
+  border: solid 3px;
+  border-color: black;
+  background-color: black;
+}
+
+#fireworks-message{
+  font-family: sans-serif;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  color: white;
+  font-size: 40px;
+}
+
+#git {
+  z-index: 100;
+}
+
+body {
+  margin: -10px -10px -10px -10px;
+}
+
+.links {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  top: 40px;
+  left:40px;
+  z-index: 100;
+  height:auto;
+  color: white;
+  margin-right: 20px;
+}
+
+.fa {
+  color: white;
+  margin-right: 30px;
+}
