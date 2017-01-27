@@ -1,0 +1,15 @@
+#canvas {
+  border: solid 3px;
+  border-color: black;
+  background-color: black;
+}
+
+.fireworks-message{
+  position: absolute;
+  top: 400px;
+  left: 400px;
+  margin: 0 auto;
+  color: white;
+  font-size: 40px;
+  z-index: 1;
+}

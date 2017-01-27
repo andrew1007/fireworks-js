@@ -42,75 +42,146 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	class Particle {
-	  constructor(x = 0, y = 0, ctx, canvas, radius) {
-	    this.x = x;
-	    this.y = y;
-	    this.gravity = 0.2;
-	    this.resistance = 0.92;
+	const Rocket = __webpack_require__(1);
+	const Particle = __webpack_require__(2);
+	
+	class Launch {
+	  constructor(x, y, ctx, canvas) {
+	    this.rockets = [];
+	    this.particles = [];
 	    this.context = ctx;
 	    this.canvas = canvas;
-	    this.posX = this.canvas.width / 2;
-	    this.posY = this.canvas.height;
-	    let angle = Math.random() * Math.PI * 2;
-	    let speed = Math.cos(Math.random() * Math.PI / 2) * 15;
-	    // console.log(speed);
-	    this.velX = Math.cos(angle) * speed + 0.5;
-	    this.velY = Math.sin(angle) * speed;
-	    this.radius = radius;
-	    this.size = 3;
-	    this.shrink = .980;
+	    this.x = x;
+	    this.y = y;
 	  }
 	
-	  velX() {
-	    return Math.cos(this.angle) * this.speed;
+	  addFirework(e) {
+	    e.preventDefault();
+	    let xPos = this.x;
+	    let yPos = this.y;
+	    let rocket = new Rocket(xPos, yPos, this.context, this.canvas);
+	    this.rockets = this.rockets.concat(rocket);
+	
+	    // this.update()
 	  }
 	
-	  velY() {
-	    return Math.cos(this.angle) * this.speed + this.gravity;
+	  welcomeFireworks() {
+	    this.rockets.push(new Rocket(this.x, this.y, this.context, this.canvas));
+	    this.update();
 	  }
 	
-	  update() {
-	    // console.log("updated");
-	    // console.log(this.velX);
-	    // console.log(this.velY);
-	    this.velX *= this.resistance;
-	    this.velY *= this.resistance;
-	    this.velY += this.gravity;
-	
-	    this.x += this.velX;
-	    this.y += this.velY;
-	    this.size *= this.shrink;
+	  getRandomColor(a) {
+	    let r = 0 + Math.round(Math.random() * 225);
+	    let g = 0 + Math.round(Math.random() * 225);
+	    let b = 0 + Math.round(Math.random() * 225);
+	    return `rgba(${r}, ${g}, ${b}, ${a})`;
 	  }
 	
-	  style() {
-	    c.save();
-	    c.globalCompositeOperation = 'lighter';
+	  clearBoard() {
+	    this.context.fillStyle = "rgba(0, 0, 0, .05)";
+	    this.context.fillRect(0, 0, canvas.width, canvas.height);
 	  }
 	
 	  exists() {
-	    if (this.size < 0.4) {
-	      return false;
-	    } else {
-	      return true;
+	    return this.rockets.length > 0;
+	  }
+	
+	  update() {
+	    if (this.particles.length > 1 || this.rockets.length > 0) {
+	      requestAnimationFrame(() => this.update());
 	    }
+	    this.rockets.forEach((firework, i) => {
+	      let color = this.getRandomColor(1);
+	      // console.log(color);
+	      if (firework.exploded()) {
+	        for (let i = 0; i < 20; i++) {
+	          this.particles = this.particles.concat(new Particle(firework.x, firework.y, this.context, this.canvas, 3, color));
+	        }
+	        this.rockets.splice(i, 1);
+	      }
+	      firework.render();
+	      firework.update();
+	    });
+	    // console.log(this.particles);
+	    this.particles = this.particles.filter(particle => {
+	      return particle.exists();
+	    });
+	    // console.log(this.particles);
+	    this.particles.forEach((particle, i) => {
+	      if (!particle.exists()) {
+	        this.particles.splice(i, 1);
+	      }
+	      particle.render();
+	      particle.update();
+	    });
+	    console.log(this.particles);
 	  }
 	
-	  render() {
-	    // console.log("drawn");
-	    this.context.fillStyle = 'white';
-	
-	    this.context.beginPath();
-	    this.context.arc(this.x, this.y, this.size, 0, Math.PI * 2, true);
-	    this.context.closePath();
-	    this.context.fill();
-	
-	    this.context.restore();
+	  distance(rocketPosX, rocketPosY) {
+	    Math.sqrt(Math.pow(this.x - rocketPosX, 2) + Math.pow(this.y - rocketPosY, 2));
 	  }
+	
 	}
 	
+	// canvas = document.getElementById('canvas')
+	// ctx = canvas.getContext( '2d' )
+	
+	
+	let canvas = document.getElementById('canvas');
+	let ctx = canvas.getContext('2d');
+	ctx.canvas.width = window.innerWidth;
+	ctx.canvas.height = window.innerHeight;
+	fireworksArr = [];
+	clearScreen = () => {
+	  ctx.fillStyle = "rgba(0, 0, 0, .15)";
+	  ctx.fillRect(0, 0, canvas.width, canvas.height);
+	  requestAnimationFrame(() => clearScreen());
+	};
+	
+	clearScreen();
+	
+	const oneThird = Math.floor(ctx.canvas.width / 3);
+	
+	const twoThird = Math.floor(ctx.canvas.width / 2);
+	const oneWhole = Math.floor(ctx.canvas.width * 2 / 3);
+	
+	for (let i = 0; i < 13; i++) {
+	  new Launch(oneThird, canvas.height, ctx, canvas).welcomeFireworks();
+	  new Launch(twoThird, canvas.height, ctx, canvas).welcomeFireworks();
+	  new Launch(oneWhole, canvas.height, ctx, canvas).welcomeFireworks();
+	}
+	
+	document.addEventListener("click", e => {
+	  let xPos = e.clientX;
+	  let yPos = e.clientY;
+	  fireworksArr = fireworksArr.filter(firework => {
+	    return firework.exists();
+	  });
+	  for (let i = 0; i < 6; i++) {
+	    var x = new Launch(xPos, canvas.height, ctx, canvas);
+	    x.addFirework(e);
+	    x.update();
+	  }
+	  // fireworksArr.push(new Launch(xPos, canvas.height, ctx, canvas))
+	  // fireworksArr.forEach( (firework, i) => {
+	  //   if (!firework.exists()){
+	  //     fireworksArr.splice(i, 1)
+	  //   }
+	  //   firework.addFirework(e)
+	  //   if (i === 0){
+	  //     firework.update()
+	  //   }
+	  // } )
+	  // x.addFirework(e)
+	  // var x = null
+	});
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
 	class Rocket {
 	  constructor(x, y, context, canvas) {
 	    this.x = x;
@@ -130,7 +201,7 @@
 	    this.context = context;
 	    this.canvas = canvas;
 	    this.velX = Math.random() * 6 - 3;
-	    this.velY = Math.random() * -3 * 4 - 6.5;
+	    this.velY = Math.random() * -4 * (y / 320) - 6.5;
 	  }
 	
 	  update() {
@@ -140,7 +211,6 @@
 	
 	    // gravity down
 	    this.velY += this.gravity;
-	    console.log(this.velY);
 	    // update position based on speed
 	    this.x += this.velX;
 	    this.y += this.velY;
@@ -184,69 +254,75 @@
 	  }
 	}
 	
-	class Launch {
-	  constructor(x, y, ctx, canvas) {
-	    this.rockets = [];
-	    this.particles = [];
-	    this.context = ctx;
-	    this.canvas = canvas;
+	module.exports = Rocket;
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	class Particle {
+	  constructor(x = 0, y = 0, ctx, canvas, radius, color) {
 	    this.x = x;
 	    this.y = y;
+	    this.gravity = 0.2;
+	    this.resistance = 0.92;
+	    this.context = ctx;
+	    this.canvas = canvas;
+	    this.posX = this.canvas.width / 2;
+	    this.posY = this.canvas.height;
+	    let angle = Math.random() * Math.PI * 2;
+	    let speed = Math.cos(Math.random() * Math.PI / 2) * 15.7;
+	    // console.log(speed);
+	    this.velX = Math.cos(angle) * speed + 0.5;
+	    this.velY = Math.sin(angle) * speed;
+	    this.radius = radius;
+	    this.size = 5.5;
+	    this.shrink = .960;
+	    this.color = color;
 	  }
 	
-	  addFirework(e) {
-	    e.preventDefault();
-	    let xPos = e.clientX;
-	    let yPos = e.clientY;
-	    let rocket = new Rocket(xPos, yPos, this.context, this.canvas);
-	    this.rockets.push(rocket);
-	    this.update();
+	  velX() {
+	    return Math.cos(this.angle) * this.speed;
 	  }
 	
-	  clearCanvas() {
-	    this.context.fillStyle = "rgba(0, 0, 0, 0.02)";
-	    this.context.fillRect(0, 0, canvas.width, canvas.height);
+	  velY() {
+	    return Math.cos(this.angle) * this.speed + this.gravity;
 	  }
 	
 	  update() {
-	    requestAnimationFrame(() => this.update());
-	    this.context.fillStyle = "rgba(0, 0, 0, 0.1)";
-	    this.context.fillRect(0, 0, canvas.width, canvas.height);
-	    this.rockets.forEach((firework, i) => {
-	      if (firework.exploded()) {
-	        for (let i = 0; i < 20; i++) {
-	          this.particles = this.particles.concat(new Particle(firework.x, firework.y, this.context, this.canvas, 1));
-	        }
-	        this.rockets.splice(i, 1);
-	      }
-	      firework.render();
-	      firework.update();
-	    });
-	    // console.log(this.particles);
-	    this.particles = this.particles.filter(particle => {
-	      return particle.exists();
-	    });
-	    // console.log(this.particles);
-	    this.particles.forEach((particle, i) => {
-	      particle.render();
-	      particle.update();
-	    });
+	    // console.log("updated");
+	    // console.log(this.velX);
+	    // console.log(this.velY);
+	    this.velX *= this.resistance;
+	    this.velY *= this.resistance;
+	    this.velY += this.gravity;
+	
+	    this.x += this.velX;
+	    this.y += this.velY;
+	    this.size *= this.shrink;
 	  }
 	
-	  distance(rocketPosX, rocketPosY) {
-	    Math.sqrt(Math.pow(this.x - rocketPosX, 2) + Math.pow(this.y - rocketPosY, 2));
+	  exists() {
+	    if (this.size < 0.4) {
+	      return false;
+	    } else {
+	      return true;
+	    }
 	  }
 	
+	  render() {
+	    this.context.fillStyle = this.color;
+	
+	    this.context.beginPath();
+	    this.context.arc(this.x, this.y, this.size, 0, Math.PI * 2, true);
+	    this.context.closePath();
+	    this.context.fill();
+	
+	    this.context.restore();
+	  }
 	}
 	
-	canvas = document.getElementById('canvas');
-	ctx = canvas.getContext('2d');
-	
-	document.addEventListener("click", e => {
-	  let x = new Launch(250, 250, ctx, canvas);
-	  x.addFirework(e);
-	});
-	// setInterval(() =, 80)
+	module.exports = Particle;
 
 /***/ }
 /******/ ]);
