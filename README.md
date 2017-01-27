@@ -1,7 +1,7 @@
 ### Firework simulator
 
 ![Live][site]
-[site]: "https://andrew1007.github.io/"
+[site]: https://andrew1007.github.io/
 
 fireworks-js is a simulation of fireworks. It is a personal project by Andrew Yueh, with the following features:
 
